@@ -15,4 +15,8 @@ public class CharacterInputs : MonoBehaviour
         if (ctx.started) Crouch = !Crouch; 
     }
 
+    private void Update()
+    {
+        Debug.Log("CharacterInputs" + InputMove);
+    }
 }

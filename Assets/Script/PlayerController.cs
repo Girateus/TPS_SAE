@@ -54,7 +54,7 @@ public class PlayerController : MonoBehaviour
         Vector3 horizontalVelocity;
         if (_landingDone)
         {
-            horizontalVelocity = transform.forward * (moveMagnitude * currentSpeed/*horizontalSpeed*/ * Time.deltaTime);
+            horizontalVelocity = transform.forward * (moveMagnitude * currentSpeed);
             
         }
         else
@@ -91,7 +91,7 @@ public class PlayerController : MonoBehaviour
         
         Quaternion rotation = Quaternion.Euler(0, cameraRotation.eulerAngles.y, 0) * inputRotation;
         
-        _controller.Move(horizontalVelocity + _verticalVelocity * Time.deltaTime);
+        _controller.Move(horizontalVelocity * Time.deltaTime + _verticalVelocity * Time.deltaTime);
         
         if (horizontalVelocity.sqrMagnitude > 0.001f)
         {
