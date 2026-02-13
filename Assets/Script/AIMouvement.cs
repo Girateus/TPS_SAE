@@ -110,7 +110,7 @@ public class AIMouvement : MonoBehaviour
         {
             _audioManager.PlaySound(_audioManager.GameOver);
             _Death.Invoke();
-            Time.timeScale = 1f;
+            Time.timeScale = 0f;
             
         }
     }

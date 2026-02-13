@@ -8,6 +8,7 @@ TagManager:
   - Item
   - Tubbies
   - Audio
+  - Ending
   layers:
   - Default
   - TransparentFX

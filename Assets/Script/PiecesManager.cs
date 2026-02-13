@@ -58,8 +58,8 @@ public class PiecesManager : MonoBehaviour
     private IEnumerator SwitchToShipCamera()
     {
         //yield return new WaitForSeconds(1f);
-        _shipCamera.Priority = _playerCamera.Priority +1;
-        yield return new WaitForSeconds(3.5f);
+        _shipCamera.Priority = _playerCamera.Priority +2;
+        yield return new WaitForSeconds(5f);
         _shipCamera.Priority = 0;
         RunAway();
     }
