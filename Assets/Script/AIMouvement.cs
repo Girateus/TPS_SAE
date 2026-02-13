@@ -1,24 +1,33 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Events;
 
 public class AIMouvement : MonoBehaviour
 {
+    [SerializeField] private UnityEvent _Death;
     [Header("Configurations")]
     public Transform target;
     public float patrolSpeed = 2f;
     public float chaseSpeed = 5f;
     public float visionRange = 10f;
-    public float visionAngle = 45f; // Angle de vue total (ex: 45° de chaque côté)
+    public float visionAngle = 45f; 
 
-    [Header("Patrouille")]
+    [Header("Patrole")]
     public float patrolRadius = 10f;
     private Vector3 _patrolTarget;
 
     private NavMeshAgent _agent;
     private Animator _animator;
-    private bool _isChasing = false;
-
-    void Start()
+    public bool _isChasing = false;
+    
+    AudioManager _audioManager;
+    
+    private void Awake()
+    {
+        _audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
+    }
+    
+    private void Start()
     {
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
@@ -26,7 +35,7 @@ public class AIMouvement : MonoBehaviour
         SetRandomPatrolPoint();
     }
 
-    void Update()
+    private void Update()
     {
         CheckLineOfSight();
 
@@ -38,49 +47,54 @@ public class AIMouvement : MonoBehaviour
         else
         {
             _agent.speed = patrolSpeed;
-            // Si l'agent arrive proche de son point de patrouille, on en cherche un autre
             if (!_agent.pathPending && _agent.remainingDistance < 0.5f)
             {
                 SetRandomPatrolPoint();
             }
         }
-
-        // Mise à jour de l'Animator
+        
         _animator.SetFloat("Velocity", _agent.velocity.magnitude);
         _animator.SetBool("IsChasing", _isChasing);
+        
     }
 
-    void CheckLineOfSight()
+   private void CheckLineOfSight()
     {
         Vector3 directionToTarget = (target.position - transform.position).normalized;
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
+    
+        bool canSeePlayer = false;
 
-        // 1. Vérifier la distance
         if (distanceToTarget < visionRange)
         {
-            // 2. Vérifier l'angle (Ligne de vue)
             float angle = Vector3.Angle(transform.forward, directionToTarget);
 
             if (angle < visionAngle)
             {
-                // 3. Raycast pour vérifier les obstacles (murs, etc.)
                 RaycastHit hit;
                 if (Physics.Raycast(transform.position + Vector3.up, directionToTarget, out hit, visionRange))
                 {
                     if (hit.transform == target)
                     {
-                        _isChasing = true;
-                        return;
+                        canSeePlayer = true;
                     }
                 }
             }
         }
         
-        // Si on perd le joueur de vue (optionnel : tu peux ajouter un timer avant d'abandonner)
-        _isChasing = false;
+        if (canSeePlayer && !_isChasing)
+        {
+            _audioManager.PlaySound(_audioManager.PlayerDetected);
+            _isChasing = true;
+        }
+        
+        else if (!canSeePlayer && _isChasing)
+        {
+            _isChasing = false;
+        }
     }
 
-    void SetRandomPatrolPoint()
+    private void SetRandomPatrolPoint()
     {
         Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
         randomDirection += transform.position;
@@ -90,7 +104,17 @@ public class AIMouvement : MonoBehaviour
         _agent.destination = _patrolTarget;
     }
 
-    // Pour visualiser la vision dans l'éditeur
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player") || other.GetComponent<PlayerController>() != null)
+        {
+            _audioManager.PlaySound(_audioManager.GameOver);
+            _Death.Invoke();
+            Time.timeScale = 1f;
+            
+        }
+    }
+    
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

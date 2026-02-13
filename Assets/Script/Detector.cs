@@ -7,13 +7,11 @@ public class Detector : MonoBehaviour
     [SerializeField] private LayerMask _layer;
     
     public bool Detected = false;
-    private readonly Collider[] _hits = new Collider[1];
     
     // Update is called once per frame
     void Update()
     {
-        int hitCount= Physics.OverlapSphereNonAlloc(transform.position, _radius, _hits, _layer);
-        Detected = hitCount > 0;
+        Detected = Physics.CheckSphere(transform.position, _radius, _layer);
     }
 
     private void OnDrawGizmos()

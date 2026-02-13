@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - CinemachineTarget
+  - Item
+  - Tubbies
+  - Audio
   layers:
   - Default
   - TransparentFX
@@ -12,7 +15,7 @@ TagManager:
   - Environment
   - Water
   - UI
-  - 
+  - Item
   - 
   - 
   - 
